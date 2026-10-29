@@ -1,0 +1,21 @@
+name: Copy verified manual beta installers
+on:
+  repository_dispatch:
+    types: [copy-manual-beta-installers]
+permissions:
+  contents: write
+concurrency:
+  group: manual-beta-${{ github.event.client_payload.tag }}
+  cancel-in-progress: false
+jobs:
+  copy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Copy verified installers into an unpublished draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/copy-manual-beta.py
