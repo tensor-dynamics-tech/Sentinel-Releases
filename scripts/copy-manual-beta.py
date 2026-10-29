@@ -14,9 +14,11 @@ def main():
     assert os.environ['GITHUB_REPOSITORY'] == REPO
     payload = json.loads(Path(os.environ['GITHUB_EVENT_PATH']).read_text())['client_payload']
     tag = payload['tag']
-    assert re.fullmatch(r'v0\.37\.0-beta\.[12]', tag)
+    assert re.fullmatch(r'v0\.37\.0-beta\.[12]', tag) or tag == 'v0.38.0'
     version = tag[1:]
     names = {f'Tensor-Dynamics-{version}-arm64-pilot.dmg': 'Sentinel-Monitor-macOS-arm64.dmg', f'Tensor-Dynamics-Setup-{version}.exe': 'Sentinel-Monitor-Windows.exe', f'Tensor-Dynamics-{version}.AppImage': 'Sentinel-Monitor-Linux.AppImage'}
+    if tag == 'v0.38.0':
+        names = {name: name for name in names}
     assets = payload['assets']
     assert len(assets) == 3 and {a['name'] for a in assets} == set(names)
     root = Path('verified-manual-installers')
